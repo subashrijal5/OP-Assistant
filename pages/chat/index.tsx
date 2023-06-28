@@ -5,6 +5,7 @@ import ChatInput from "@/components/Chat/ChatInput";
 import TypingBubble from "@/components/Chat/TypingBubble";
 
 export default function IndexPage() {
+    const { user, error, isLoading } = useUser();
     return (
         <Master>
             <div className="relative h-[85vh] w-full ">
