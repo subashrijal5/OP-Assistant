@@ -2,13 +2,13 @@ import { findOrCreateUser } from "@/pages/backend/user";
 import { Session, handleAuth, handleCallback } from "@auth0/nextjs-auth0";
 import { NextApiRequest, NextApiResponse } from "next";
 
-const afterCallback =  (
+const afterCallback = (
     req: NextApiRequest,
     res: NextApiResponse,
     session: Session
 ): Session | undefined => {
     try {
-        const user =  findOrCreateUser({
+        const user = findOrCreateUser({
             email: session.user.email,
             name: session.user.name,
         });
@@ -23,6 +23,7 @@ const afterCallback =  (
 };
 
 export default handleAuth({
+    
     async callback(req, res) {
         try {
             await handleCallback(req, res, { afterCallback });

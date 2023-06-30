@@ -1,45 +1,49 @@
-import React from "react";
-import { AudioRecorder } from "react-audio-voice-recorder";
+import React, { useState } from "react";
+import MicInput, { MicInputProps } from "./MicInput";
+import { useTranslations } from "next-intl";
+import { GetStaticPropsContext } from "next";
 
-const addAudioElement = (blob: Blob) => {
-    console.log('blob');
-    const url = URL.createObjectURL(blob);
-    const audio = document.createElement("audio");
-    audio.src = url;
-    audio.controls = true;
-    audio.play()
-    console.log('here')
-
+type Props = {
+    onSendMessage: (text: string) => void;
+    micInputProps: MicInputProps;
 };
 
-const ChatInput = () => {
-    
+const ChatInput = ({ micInputProps, onSendMessage }: Props) => {
+
+    const t = useTranslations("Chat")
+
+    const [message, setMessage] = useState('')
+     const handleSubmitForm = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const target = e.target as typeof e.target & {
+            message: { value: string };
+        };
+        const text = target.message.value;
+        if(text.length < 5) return;
+        onSendMessage(text);
+        target.message.value = "";
+    };
+
     return (
         <div className="absolute bottom-0 right-0 w-full">
             <div className="border-t-2 border-gray-200 card dark:border-gray-600 ">
-                <div className="px-2 card-body md:p-none">
-                    <div className="join">
-                    <div className="relative btn join-item">
-                       <AudioRecorder
-                           classes={{AudioRecorderClass: "flex items-center justify-center absolute left-0"}}
-                            onRecordingComplete={addAudioElement}
-                            showVisualizer
-                            audioTrackConstraints={{
-                                noiseSuppression: true,
-                                echoCancellation: true,
-                            }}
-                            downloadFileExtension="mp3"
-                        />
-                       </div>
-                        <textarea
-                            className="w-full ml-4 textarea-xs textarea textarea-bordered"
-                            placeholder="Type your message ...."
-                        ></textarea>
+                <form onSubmit={handleSubmitForm}>
+                    <div className="px-2 card-body md:p-none">
+                        <div className="join bg-inherit">
+                            <div className="relative flex gap-3 join-item">
+                                <MicInput {...micInputProps} />
+                            </div>
+                            <textarea
+                            onChange={(e) => setMessage(e.target.value)}
+                            name="message"
+                                className="w-full ml-4 textarea-xs textarea textarea-bordered"
+                                placeholder={t("typeMessage")}
+                            ></textarea>
 
-                        <button className="btn join-item">Send</button>
-                      
+                            <button className="btn join-item">{t("send")}</button>
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     );

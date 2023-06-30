@@ -3,8 +3,10 @@ import React from "react";
 import { useTranslations } from "use-intl";
 import ThemeSwitch from "../ThemeSwitcher";
 import LocaleSwitcher from "../LocaleSwitcher";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 const Header = () => {
+  const {user} = useUser()
   const t = useTranslations("Header");
   return (
     <div className="sticky top-0 z-50">
@@ -18,7 +20,7 @@ const Header = () => {
           />
         </div>
         <div className="hidden navbar-center md:block">
-          <span className="badge badge-primary badge-lg">OP Assistant</span>
+          <span className="badge badge-primary badge-lg">{user?.name ?? 'OP Assistant'}</span>
         </div>
         <div className="gap-4 navbar-end">
           <LocaleSwitcher />
