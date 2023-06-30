@@ -1,6 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
 import locales from "../data/locales";
-import { usePathname } from "next-intl/client";
 import { useRouter } from "next/router";
 import { ChangeEvent } from "react";
 
