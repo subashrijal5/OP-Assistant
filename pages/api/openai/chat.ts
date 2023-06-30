@@ -80,7 +80,7 @@ export default async function handler(
        }
        catch(e){
         console.log(e)
-        return res.status(400).json({ role: "system", message: "Bad Request", chatId: null });
+        return res.status(400).json({ role: "system", message: "Bad Request", chatId: 0 });
        }
     }
     // return res.status(400).json({ response: "Bad Request" });
