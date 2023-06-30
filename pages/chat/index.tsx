@@ -38,7 +38,7 @@ export default function IndexPage() {
         startRecording,
         stopRecording,
     } = useWhisper({
-        apiKey: "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",
+        apiKey: process.env.OPENAI_API_KEY,
         removeSilence: true,
     });
 
