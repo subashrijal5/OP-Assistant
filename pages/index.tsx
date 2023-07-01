@@ -4,12 +4,13 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import Master from "@/layouts/Master";
 import { GetStaticPropsContext } from "next";
 import { useRouter } from "next/router";
-import { useTranslations } from "next-intl";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 export default function IndexPage() {
     const { user, error, isLoading } = useUser();
     const router = useRouter();
-    const t = useTranslations("Index");
+    const { t } = useTranslation();
     const handleStartChat = async () => {
         const response = await fetch("/api/chat/create", {
             method: "POST",
@@ -36,30 +37,28 @@ export default function IndexPage() {
                     <div>
                         {user ? (
                             <h1 className="text-5xl font-bold">
-                                {t("loggedIn", { username: user.name })}
+                                {t("home:loggedIn", { username: user.name })}
                             </h1>
                         ) : (
                             <h1 className="text-5xl font-bold">
-                              {t("yourAssistant")}
+                                {t("home:yourAssistant")}
                             </h1>
                         )}
 
-                        <p className="py-6">
-                            {t('about')}
-                        </p>
+                        <p className="py-6">{t("home:about")}</p>
                         {user ? (
                             <button
                                 onClick={handleStartChat}
                                 className="btn btn-primary"
                             >
-                               {t('startTalk')}
+                                {t("home:startTalk")}
                             </button>
                         ) : (
                             <Link
                                 href={"/api/auth/login"}
                                 className="btn btn-primary"
                             >
-                               {t('login')}
+                                {t("home:login")}
                             </Link>
                         )}
                     </div>
@@ -69,10 +68,10 @@ export default function IndexPage() {
     );
 }
 
-export async function getStaticProps({ locale }: GetStaticPropsContext) {
+export async function getStaticProps({ locale }:GetStaticPropsContext) {
     return {
-        props: {
-            locales: (await import(`../locales/${locale}.json`)).default,
-        },
-    };
-}
+      props: {
+        ...(await serverSideTranslations(locale as string, ['home'])),
+      }
+    } 
+  }
