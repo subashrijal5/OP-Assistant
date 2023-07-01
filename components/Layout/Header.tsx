@@ -1,13 +1,12 @@
 import Image from "next/image";
 import React from "react";
-import { useTranslations } from "use-intl";
 import ThemeSwitch from "../ThemeSwitcher";
 import LocaleSwitcher from "../LocaleSwitcher";
 import { useUser } from "@auth0/nextjs-auth0/client";
 
 const Header = () => {
   const {user} = useUser()
-  const t = useTranslations("Header");
+
   return (
     <div className="sticky top-0 z-50">
       <div className="bg-gray-200 navbar dark:bg-gray-600">

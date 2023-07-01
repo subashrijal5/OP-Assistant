@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import MicInput, { MicInputProps } from "./MicInput";
-import { useTranslations } from "next-intl";
-import { GetStaticPropsContext } from "next";
+import { useTranslation, withTranslation, Trans } from 'react-i18next';
 
 type Props = {
     onSendMessage: (text: string) => void;
@@ -10,7 +9,7 @@ type Props = {
 
 const ChatInput = ({ micInputProps, onSendMessage }: Props) => {
 
-    const t = useTranslations("Chat")
+    const {t }= useTranslation()
 
     const [message, setMessage] = useState('')
      const handleSubmitForm = (e: React.FormEvent<HTMLFormElement>) => {
@@ -37,10 +36,10 @@ const ChatInput = ({ micInputProps, onSendMessage }: Props) => {
                             onChange={(e) => setMessage(e.target.value)}
                             name="message"
                                 className="w-full ml-4 textarea-xs textarea textarea-bordered"
-                                placeholder={t("typeMessage")}
+                                placeholder={t("chat:typeMessage") ?? ''}
                             ></textarea>
 
-                            <button className="btn join-item">{t("send")}</button>
+                            <button className="btn join-item">{t("chat:send")}</button>
                         </div>
                     </div>
                 </form>

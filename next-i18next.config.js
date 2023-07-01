@@ -1,6 +1,8 @@
+// next-i18next.config.js
 module.exports = {
-    i18n: {
-      defaultLocale: 'en',
-      locales: ['en', 'ja', 'ne'], // Add more locales as needed
-    },
-  };
+  i18n: {
+    defaultLocale: "en",
+    locales: ["en","ja","ne"],
+    react: { useSuspense: false }
+  }
+}
