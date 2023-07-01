@@ -6,11 +6,11 @@ import { useWhisper } from "@chengsokdara/use-whisper";
 import { useEffect, useState } from "react";
 import ChatBubble, { ChatBubbleProps } from "@/components/Chat/ChatBubble";
 import { GetStaticPropsContext } from "next";
-import { useTranslations } from "next-intl";
+import { useTranslation, withTranslation, Trans } from 'react-i18next';
 
 export default function IndexPage() {
     const { user, error, isLoading } = useUser();
-    const t = useTranslations("Chat");
+    const{ t }= useTranslation();
 
     const [messages, setMessages] = useState<ChatBubbleProps[]>([]);
 
@@ -82,6 +82,7 @@ export default function IndexPage() {
         const messageObj = await response.json();
         setMessageObject(messageObj.content, messageObj.role);
     };
+   
     return (
         <Master>
             <div className="relative h-[85vh] w-full ">

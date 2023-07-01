@@ -1,0 +1,21 @@
+import type { NextApiRequest, NextApiResponse } from "next";
+import { Chat } from "@prisma/client";
+import { ChatWithMessages, findOrCreateChat } from "@/pages/backend/chat";
+import { findUser } from "@/pages/backend/user";
+
+export default async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse<ChatWithMessages | null>
+) {
+    const { method } = req;
+
+    if (method === "POST") {
+        const user = await findUser(req.body.email);
+        if (!user) throw Error("Invalud user ");
+        const chat = await findOrCreateChat({
+            userId: user.id,
+        });
+        return res.status(201).json(chat);
+
+    }
+}

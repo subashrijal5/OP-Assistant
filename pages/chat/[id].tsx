@@ -5,9 +5,11 @@ import { MicInputProps } from "../../components/Chat/MicInput";
 import { useWhisper } from "@chengsokdara/use-whisper";
 import { useEffect, useRef, useState } from "react";
 import ChatBubble, { ChatBubbleProps } from "@/components/Chat/ChatBubble";
-import { Message } from "@prisma/client";
+import {  Message } from "@prisma/client";
 import { useRouter } from "next/router";
 import TypingBubble from "@/components/Chat/TypingBubble";
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { GetStaticPaths, GetStaticPropsContext } from "next";
 
 export default function ChatIdPage() {
     const { user, error, isLoading } = useUser();
@@ -53,7 +55,6 @@ export default function ChatIdPage() {
             ];
         });
     };
-
     const {
         recording,
         speaking,
@@ -63,13 +64,14 @@ export default function ChatIdPage() {
         startRecording,
         stopRecording,
     } = useWhisper({
-        apiKey: "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",
+        apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
         removeSilence: true,
         whisperConfig: {
             language: router.locale 
         }
         // onTranscribe,
     });
+  
 
     const messagesEndRef = useRef(null)
 
@@ -143,3 +145,25 @@ export default function ChatIdPage() {
         </Master>
     );
 }
+
+export async function getStaticProps({ locale }:GetStaticPropsContext) {
+    return {
+      props: {
+        ...(await serverSideTranslations(locale as string, ['chat'])),
+      }
+    } 
+  }
+
+
+export const getStaticPaths: GetStaticPaths = async () => {
+    return {
+      paths: [
+        {
+          params: {
+            id: 'next.js',
+          },
+        }, 
+      ],
+      fallback: true, 
+    }
+  }
