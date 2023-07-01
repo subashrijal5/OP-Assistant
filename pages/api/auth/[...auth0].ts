@@ -1,4 +1,4 @@
-import { findOrCreateUser } from "@/pages/backend/user";
+import { findOrCreateUser } from "@/services/backend/user";
 import { Session, handleAuth, handleCallback } from "@auth0/nextjs-auth0";
 import { NextApiRequest, NextApiResponse } from "next";
 

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Chat } from "@prisma/client";
-import { ChatWithMessages, findOrCreateChat } from "@/pages/backend/chat";
-import { findUser } from "@/pages/backend/user";
+import { ChatWithMessages, findOrCreateChat } from "@/services/backend/chat";
+import { findUser } from "@/services/backend/user";
 
 export default async function handler(
     req: NextApiRequest,

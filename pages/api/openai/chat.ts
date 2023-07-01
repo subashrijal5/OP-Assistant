@@ -2,9 +2,9 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import * as openai from "openai";
 import * as fs from "fs";
 import { PrismaClient } from "@prisma/client";
-import { findOrCreateChat } from "@/pages/backend/chat";
-import { createMessage } from "@/pages/backend/message";
-import { findOrCreateUser, findUser } from "@/pages/backend/user";
+import { findOrCreateChat } from "@/services/backend/chat";
+import { createMessage } from "@/services/backend/message";
+import { findOrCreateUser, findUser } from "@/services/backend/user";
 
 type Data = {
     role: string;
