@@ -1,100 +1,88 @@
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Master from "@/layouts/Master";
-import ChatInput from "@/components/Chat/ChatInput";
-import { MicInputProps } from "../../components/Chat/MicInput";
-import { useWhisper } from "@chengsokdara/use-whisper";
-import { useEffect, useState } from "react";
-import ChatBubble, { ChatBubbleProps } from "@/components/Chat/ChatBubble";
 import { GetStaticPropsContext } from "next";
-import { useTranslation, withTranslation, Trans } from 'react-i18next';
+import { useTranslation, withTranslation, Trans } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import HistoryItem from "@/components/Chat/HistoryItem";
+import { useRouter } from "next/router";
+import { useQuery } from "react-query";
+import { ChatWithMessages } from "../backend/chat";
+import ChatBubble from "@/components/Chat/ChatBubble";
 
 export default function IndexPage() {
     const { user, error, isLoading } = useUser();
-    const{ t }= useTranslation();
-
-    const [messages, setMessages] = useState<ChatBubbleProps[]>([]);
-
-    const setMessageObject = (message: string, role: string) => {
-        setMessages((prev) => {
-            return [
-                ...prev,
-                {
-                    role: role,
-                    message: message,
-                    isMe: role === "user",
-                    sender: role === "user" ? user?.name ?? "" : "Assistant",
-                    time: new Date().getTime().toString(),
-                },
-            ];
-        });
-    };
-
+    const { t } = useTranslation();
+    const router = useRouter();
     const {
-        recording,
-        speaking,
-        transcribing,
-        transcript,
-        pauseRecording,
-        startRecording,
-        stopRecording,
-    } = useWhisper({
-        apiKey: process.env.OPENAI_API_KEY,
-        removeSilence: true,
-    });
+        data: chats,
+        isLoading: isChatsLoading,
+        isError: isChatsError,
+    } = useQuery("chats", () =>
+        fetch("/api/chat/list").then((res) => res.json())
+    );
 
-    const micInputProps: MicInputProps = {
-        startRecording: () => {
-            startRecording();
-        },
-        stopRecording: () => {
-            stopRecording();
-        },
-        pauseRecording: () => {
-            pauseRecording();
-        },
-        recording: recording,
-        speaking: speaking,
-        transcribing: transcribing,
-        transcript: transcript,
-    };
+    if (isLoading) return <div>Loading...</div>;
+    if (error) return <div>{error.message}</div>;
 
-    useEffect(() => {
-        console.log("transcript.text", transcribing);
-        if (transcript.text) {
-            handleSendMessage(transcript.text);
-        }
-    }, [transcribing]);
-
-    const handleSendMessage = async (message: string) => {
-        setMessageObject(message, "user");
-        const response = await fetch("/api/openai/chat", {
+    const handleStartChat = async () => {
+        const response = await fetch("/api/chat/create", {
             method: "POST",
             headers: {
-                Accept: "application/json",
                 "Content-Type": "application/json",
+                Accept: "application/json",
             },
-            body: JSON.stringify({
-                message: message,
-                role: "user",
-                email: user?.email,
-            }),
+            body: JSON.stringify({ email: user?.email ?? "" }),
         });
-        const messageObj = await response.json();
-        setMessageObject(messageObj.content, messageObj.role);
+        const chat = await response.json();
+        router.push(`/chat/${chat.id}`);
     };
-   
+
     return (
         <Master>
-            <div className="relative h-[85vh] w-full ">
-                <div className=" px-3 h-[65vh] overflow-y-scroll ">
-                    {messages.map((message, i) => (
-                        <ChatBubble key={i} {...message} />
-                    ))}
+            <div className="w-full mb-40 card ">
+                <div className="card-body">
+                    <h2 className="card-title">Your Chat Histories</h2>
+                    <hr />
+                    <p>
+                        You can check your chat histories and continue
+                        conversation from here.
+                    </p>
+                    <div className="flex flex-col gap-3">
+                        {chats?.map((chat: ChatWithMessages) => {
+                            return (
+                                <HistoryItem
+                                    key={chat.id}
+                                    title={getTitle(chat)}
+                                    id={chat.id}
+                                >
+                                    {chat.messages?.map((message) => {
+                                        return (
+                                            <ChatBubble
+                                                key={message.id}
+                                                isMe={message.role === "user"}
+                                                sender={
+                                                    message.role === "user"
+                                                        ? user?.name!
+                                                        : "System"
+                                                }
+                                                message={message.message!}
+                                                time={new Date()
+                                                    .getTime()
+                                                    .toFixed()
+                                                    .toString()}
+                                            ></ChatBubble>
+                                        );
+                                    })}
+                                </HistoryItem>
+                            );
+                        })}
+                    </div>
+                    <div className="justify-end card-actions">
+                        <button onClick={handleStartChat} className="btn">
+                            Start New conversation
+                        </button>
+                    </div>
                 </div>
-                <ChatInput
-                    micInputProps={micInputProps}
-                    onSendMessage={handleSendMessage}
-                />
             </div>
         </Master>
     );
@@ -103,7 +91,15 @@ export default function IndexPage() {
 export async function getStaticProps({ locale }: GetStaticPropsContext) {
     return {
         props: {
-            locales: (await import(`../../locales/${locale}.json`)).default,
+            ...(await serverSideTranslations(locale as string, ["chat"])),
         },
     };
 }
+
+const getTitle = (chat: ChatWithMessages) => {
+    if (!chat.messages || chat.messages.length < 1) return chat.title;
+    const lastMessage = chat.messages[0];
+    return lastMessage?.message && lastMessage?.message.length > 100
+        ? lastMessage.message?.substring(0, 100) + "..."
+        : lastMessage.message!;
+};

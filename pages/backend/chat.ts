@@ -35,7 +35,9 @@ const findOrCreate = async (
     });
 };
 
-const findChatWithMessages = async (chatId: number): Promise<ChatWithMessages | null> => {
+const findChatWithMessages = async (
+    chatId: number
+): Promise<ChatWithMessages | null> => {
     return await prisma.chat.findUnique({
         where: {
             id: chatId,
@@ -46,4 +48,14 @@ const findChatWithMessages = async (chatId: number): Promise<ChatWithMessages | 
     });
 };
 
-export { findOrCreate as findOrCreateChat, findChatWithMessages };
+const getUserChats = async (userId: number): Promise<ChatWithMessages[]> => {
+    return await prisma.chat.findMany({
+        where: {
+            userId,
+        },
+        include: {
+            messages: true,
+        },
+    });
+};
+export { findOrCreate as findOrCreateChat, findChatWithMessages, getUserChats };
