@@ -100,6 +100,6 @@ const getTitle = (chat: ChatWithMessages) => {
     if (!chat.messages || chat.messages.length < 1) return chat.title;
     const lastMessage = chat.messages[0];
     return lastMessage?.message && lastMessage?.message.length > 100
-        ? lastMessage.message?.substring(0, 100) + "..."
+        ? lastMessage.message?.substring(0, 60) + "..."
         : lastMessage.message!;
 };
