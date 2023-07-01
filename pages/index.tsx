@@ -5,7 +5,7 @@ import Master from "@/layouts/Master";
 import { GetStaticPropsContext } from "next";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export default function IndexPage() {
     const { user, error, isLoading } = useUser();
@@ -30,14 +30,15 @@ export default function IndexPage() {
                     <Image
                         src="/images/img_mission.jpeg"
                         className="max-w-xs rounded-lg shadow-2xl xl:max-w-sm w-[14rem] md:w-auto"
-                        height={500}
-                        width={500}
+                        height={400}
+                        width={400}
                         alt="Stock photo"
                     />
                     <div>
                         {user ? (
                             <h1 className="text-5xl font-bold">
-                                {t("home:loggedIn", { username: user.name })}
+                                {t("common:hello")} {user.name}{" !! "} <br />
+                                {t("home:loggedIn")}
                             </h1>
                         ) : (
                             <h1 className="text-5xl font-bold">
@@ -47,12 +48,26 @@ export default function IndexPage() {
 
                         <p className="py-6">{t("home:about")}</p>
                         {user ? (
-                            <button
+                           <div className="flex justify-start gap-4">
+                             <button
                                 onClick={handleStartChat}
-                                className="btn btn-primary"
+                                className="btn btn-primary btn-outline"
                             >
                                 {t("home:startTalk")}
                             </button>
+                             <Link
+                                href={"/chat"}
+                                className="btn btn-info btn-outline"
+                            >
+                                {t("home:history")}
+                            </Link>
+                             <Link
+                                href={"/api/auth/logout"}
+                                className="btn btn-error btn-outline"
+                            >
+                                {t("home:logout")}
+                            </Link>
+                           </div>
                         ) : (
                             <Link
                                 href={"/api/auth/login"}
@@ -68,10 +83,10 @@ export default function IndexPage() {
     );
 }
 
-export async function getStaticProps({ locale }:GetStaticPropsContext) {
+export async function getStaticProps({ locale }: GetStaticPropsContext) {
     return {
-      props: {
-        ...(await serverSideTranslations(locale as string, ['home'])),
-      }
-    } 
-  }
+        props: {
+            ...(await serverSideTranslations(locale as string, ["home", 'common'])),
+        },
+    };
+}

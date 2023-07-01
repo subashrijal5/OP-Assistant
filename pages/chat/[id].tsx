@@ -5,10 +5,10 @@ import { MicInputProps } from "../../components/Chat/MicInput";
 import { useWhisper } from "@chengsokdara/use-whisper";
 import { useEffect, useRef, useState } from "react";
 import ChatBubble, { ChatBubbleProps } from "@/components/Chat/ChatBubble";
-import {  Message } from "@prisma/client";
+import { Message } from "@prisma/client";
 import { useRouter } from "next/router";
 import TypingBubble from "@/components/Chat/TypingBubble";
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetStaticPaths, GetStaticPropsContext } from "next";
 
 export default function ChatIdPage() {
@@ -19,9 +19,12 @@ export default function ChatIdPage() {
     const [messages, setMessages] = useState<ChatBubbleProps[]>([]);
     const [sending, setSending] = useState<boolean>(false);
 
-    const fetchMessages =  async () => {
+    const fetchMessages = async () => {
         const res = await fetch(`/api/chat/${id}`);
         const messageData = await res.json();
+        if (!res.ok) {
+            router.push("/404");
+        }
         if (messageData) {
             const initialValue = messageData.map((message: Message) => {
                 return {
@@ -29,17 +32,21 @@ export default function ChatIdPage() {
                     message: message.message,
                     isMe: message.role === "user",
                     sender:
-                        message.role === "user" ? user?.name ?? "" : "Assistant",
+                        message.role === "user"
+                            ? user?.name ?? ""
+                            : "Assistant",
                     time: new Date().getTime().toString(),
                 };
             });
             setMessages(initialValue);
         }
     };
-   
-    useEffect(()=> {
-        fetchMessages()
-    }, [id])
+
+    useEffect(() => {
+        if (id) {
+            fetchMessages();
+        }
+    }, [id]);
 
     const setMessageObject = (message: string, role: string) => {
         setMessages((prev) => {
@@ -67,18 +74,17 @@ export default function ChatIdPage() {
         apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
         removeSilence: true,
         whisperConfig: {
-            language: router.locale 
-        }
+            language: router.locale,
+        },
         // onTranscribe,
     });
-  
 
-    const messagesEndRef = useRef(null)
+    const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
         // @ts-ignore
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-      }
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
 
     const micInputProps: MicInputProps = {
         startRecording: () => {
@@ -104,11 +110,11 @@ export default function ChatIdPage() {
     }, [transcript]);
 
     useEffect(() => {
-        scrollToBottom()
+        scrollToBottom();
     }, [messages, sending]);
-    
+
     const handleSendMessage = async (message: string) => {
-        setSending(true)
+        setSending(true);
         setMessageObject(message, "user");
         const response = await fetch("/api/openai/chat", {
             method: "POST",
@@ -125,7 +131,7 @@ export default function ChatIdPage() {
         });
         const messageObj = await response.json();
         setMessageObject(messageObj.content, messageObj.role);
-        setSending(false)
+        setSending(false);
     };
     return (
         <Master>
@@ -134,7 +140,7 @@ export default function ChatIdPage() {
                     {messages.map((message, i) => (
                         <ChatBubble key={i} {...message} />
                     ))}
-                    {sending && <TypingBubble/>}
+                    {sending && <TypingBubble />}
                     <div ref={messagesEndRef} />
                 </div>
                 <ChatInput
@@ -146,24 +152,23 @@ export default function ChatIdPage() {
     );
 }
 
-export async function getStaticProps({ locale }:GetStaticPropsContext) {
+export async function getStaticProps({ locale }: GetStaticPropsContext) {
     return {
-      props: {
-        ...(await serverSideTranslations(locale as string, ['chat'])),
-      }
-    } 
-  }
-
+        props: {
+            ...(await serverSideTranslations(locale as string, ["chat"])),
+        },
+    };
+}
 
 export const getStaticPaths: GetStaticPaths = async () => {
     return {
-      paths: [
-        {
-          params: {
-            id: 'next.js',
-          },
-        }, 
-      ],
-      fallback: true, 
-    }
-  }
+        paths: [
+            {
+                params: {
+                    id: "next.js",
+                },
+            },
+        ],
+        fallback: true,
+    };
+};
