@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -35,7 +36,7 @@ model Chat {
   user      User      @relation(fields: [userId], references: [id])
   parent    Chat?     @relation("children", fields: [parentId], references: [id])
   children  Chat[]    @relation("children")
-  messages   Message[]
+  messages  Message[]
 }
 
 model Message {
