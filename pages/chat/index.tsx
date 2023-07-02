@@ -7,9 +7,11 @@ import { useRouter } from "next/router";
 import { useQuery } from "react-query";
 import { ChatWithMessages } from "../../services/backend/chat";
 import ChatBubble from "@/components/Chat/ChatBubble";
+import { useTranslation } from "next-i18next";
 
 export default function IndexPage() {
     const { user, error, isLoading } = useUser();
+    const {t} = useTranslation()
     const router = useRouter();
     const {
         data: chats,
@@ -40,11 +42,10 @@ export default function IndexPage() {
         <Master>
             <div className="w-full mb-40 card ">
                 <div className="card-body">
-                    <h2 className="card-title">Your Chat Histories</h2>
+                    <h2 className="card-title">{t('chat:chatHistory')}</h2>
                     <hr />
                     <p>
-                        You can check your chat histories and continue
-                        conversation from here.
+                      {t('chat:checkHistory')}
                     </p>
                     <div className="flex flex-col gap-3">
                         {chats?.map((chat: ChatWithMessages) => {
@@ -78,7 +79,7 @@ export default function IndexPage() {
                     </div>
                     <div className="justify-end card-actions">
                         <button onClick={handleStartChat} className="btn">
-                            Start New conversation
+                            {t('chat:startChat')}
                         </button>
                     </div>
                 </div>

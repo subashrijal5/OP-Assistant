@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { useTranslation } from "next-i18next";
 
 type HistoryItemProps = {
     checked?: boolean;
@@ -9,6 +10,7 @@ type HistoryItemProps = {
 };
 
 const HistoryItem = ({ checked, title, children, id }: HistoryItemProps) => {
+    const {t} = useTranslation()
     return (
         <div className="collapse collapse-arrow border-1 bg-slate-200 dark:bg-base-200 ">
             <input type="radio" name="my-accordion-2" checked={checked} />
@@ -19,7 +21,7 @@ const HistoryItem = ({ checked, title, children, id }: HistoryItemProps) => {
                     href={`/chat/${id}`}
                     className="ml-4 w-fit btn-sm btn btn-info btn-outline"
                 >
-                    Continue convertation
+                  {t('chat:continueConversation')} 
                 </Link>
 
             <div className="collapse-content  max-h-[40vh] overflow-y-scroll">
