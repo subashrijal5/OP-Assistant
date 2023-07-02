@@ -2,8 +2,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import {
     ChatWithMessages,
     getUserChats,
-} from "@/pages/backend/chat";
-import { findUser } from "@/pages/backend/user";
+} from "@/services/backend/chat";
+import { findUser } from "@/services/backend/user";
 import { getSession } from "@auth0/nextjs-auth0";
 
 export default async function handler(

@@ -6,7 +6,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import HistoryItem from "@/components/Chat/HistoryItem";
 import { useRouter } from "next/router";
 import { useQuery } from "react-query";
-import { ChatWithMessages } from "../backend/chat";
+import { ChatWithMessages } from "../../services/backend/chat";
 import ChatBubble from "@/components/Chat/ChatBubble";
 
 export default function IndexPage() {

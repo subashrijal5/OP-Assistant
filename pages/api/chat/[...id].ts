@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { findChatWithMessages } from "@/pages/backend/chat";
+import { findChatWithMessages } from "@/services/backend/chat";
 import { Message } from "@prisma/client";
 
 
