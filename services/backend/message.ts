@@ -13,6 +13,12 @@ const create = async (messageData: MessageData): Promise<Message | null> => {
         data: {
             ...messageData,
         },
+    }).then(async (chat) => {
+        await prisma.$disconnect()
+        return chat;
+    }).catch(async (err) => {    console.error(err);
+        await prisma.$disconnect()
+        return null;
     });
     return message
 };

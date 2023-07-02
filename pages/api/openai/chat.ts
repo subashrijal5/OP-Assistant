@@ -12,8 +12,6 @@ type Data = {
     chatId?: number;
 };
 
-const prisma = new PrismaClient();
-
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Data>

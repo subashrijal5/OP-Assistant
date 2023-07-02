@@ -1,7 +1,6 @@
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Master from "@/layouts/Master";
 import { GetStaticPropsContext } from "next";
-import { useTranslation, withTranslation, Trans } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import HistoryItem from "@/components/Chat/HistoryItem";
 import { useRouter } from "next/router";
@@ -11,18 +10,18 @@ import ChatBubble from "@/components/Chat/ChatBubble";
 
 export default function IndexPage() {
     const { user, error, isLoading } = useUser();
-    const { t } = useTranslation();
     const router = useRouter();
     const {
         data: chats,
         isLoading: isChatsLoading,
         isError: isChatsError,
+        error: chatsError,
     } = useQuery("chats", () =>
         fetch("/api/chat/list").then((res) => res.json())
     );
 
-    if (isLoading) return <div>Loading...</div>;
-    if (error) return <div>{error.message}</div>;
+    if (isLoading || isChatsLoading) return <div>Loading...</div>;
+    if (error || chatsError) return <div>Something went wrong. Please try again</div>;
 
     const handleStartChat = async () => {
         const response = await fetch("/api/chat/create", {

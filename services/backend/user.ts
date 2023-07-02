@@ -22,6 +22,12 @@ const findOrCreate = async (userData: UserData): Promise<User | null> => {
             email: userData.email,
             name: userData.name ?? "Unnamed",
         },
+    }).then(async (user) => {
+        await prisma.$disconnect()
+        return user;
+    }).catch(async (err) => {    console.error(err);
+        await prisma.$disconnect()
+        return null;
     });
 };
 
@@ -30,6 +36,12 @@ const findUser = async (email: string) => {
         where: {
             email: email,
         },
+    }).then(async (user) => {
+        await prisma.$disconnect()
+        return user;
+    }).catch(async (err) => {    console.error(err);
+        await prisma.$disconnect()
+        return null;
     });
 };
 

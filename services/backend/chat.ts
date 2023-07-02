@@ -27,35 +27,67 @@ const findOrCreate = async (
         return chat;
     }
 
-    return await prisma.chat.create({
-        data: {
-            userId: chatData.userId,
-            title: chatData.title ?? "Untitled",
-        },
-    });
+    return await prisma.chat
+        .create({
+            data: {
+                userId: chatData.userId,
+                title: chatData.title ?? "Untitled",
+            },
+        })
+        .then(async (chat) => {
+            await prisma.$disconnect();
+            return chat;
+        })
+        .catch(async (err) => {
+            console.error(err);
+            await prisma.$disconnect();
+            return null;
+        });
 };
 
 const findChatWithMessages = async (
     chatId: number
 ): Promise<ChatWithMessages | null> => {
-    return await prisma.chat.findUnique({
-        where: {
-            id: chatId,
-        },
-        include: {
-            messages: true,
-        },
-    });
+    return await prisma.chat
+        .findUnique({
+            where: {
+                id: chatId,
+            },
+            include: {
+                messages: true,
+            },
+        })
+        .then(async (chat) => {
+            await prisma.$disconnect();
+            return chat;
+        })
+        .catch(async (err) => {
+            console.error(err);
+            await prisma.$disconnect();
+            return null;
+        });
 };
 
-const getUserChats = async (userId: number): Promise<ChatWithMessages[]> => {
-    return await prisma.chat.findMany({
-        where: {
-            userId,
-        },
-        include: {
-            messages: true,
-        },
-    });
+const getUserChats = async (
+    userId: number
+): Promise<ChatWithMessages[] | null> => {
+    return await prisma.chat
+        .findMany({
+            where: {
+                userId,
+            },
+            include: {
+                messages: true,
+            },
+        })
+        .then(async (chat) => {
+            await prisma.$disconnect();
+            return chat;
+        })
+        .catch(async (err) => {
+            console.error(err);
+            await prisma.$disconnect();
+            return null;
+        });
 };
 export { findOrCreate as findOrCreateChat, findChatWithMessages, getUserChats };
