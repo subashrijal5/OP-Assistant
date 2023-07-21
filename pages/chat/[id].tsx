@@ -130,7 +130,7 @@ export default function ChatIdPage() {
             }),
         });
         const messageObj = await response.json();
-        setMessageObject(messageObj.content, messageObj.role);
+        setMessageObject(messageObj.message, messageObj.role);
         setSending(false);
     };
     return (

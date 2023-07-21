@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "i18nexus pull && next dev",
+    "dev": " next dev",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^2.6.2",
+    "@azure/openai": "^1.0.0-beta.3",
     "@chengsokdara/use-whisper": "^0.2.0",
     "@ffmpeg/core": "^0.11.0",
     "@ffmpeg/ffmpeg": "^0.11.6",

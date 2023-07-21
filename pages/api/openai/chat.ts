@@ -1,27 +1,23 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import * as openai from "openai";
-import * as fs from "fs";
 import { PrismaClient } from "@prisma/client";
 import { findOrCreateChat } from "@/services/backend/chat";
 import { createMessage } from "@/services/backend/message";
 import { findOrCreateUser, findUser } from "@/services/backend/user";
+import { OpenAIClient, AzureKeyCredential, ChatRole } from "@azure/openai";
 
 type Data = {
     role: string;
     message: string;
     chatId?: number;
 };
+const endpoint =
+    "https://test-003.openai.azure.com";
+const apikey = process.env.AZURE_OPENAI_API_ENDPOINT;
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Data>
 ) {
-    const { Configuration, OpenAIApi } = openai;
-
-    const configuration = new Configuration({
-        apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-    });
-    const openaiApi = new OpenAIApi(configuration);
 
     const { method } = req;
 
@@ -69,7 +65,7 @@ export default async function handler(
             const previousConvertations =
                 chat.messages?.map((m) => {
                     return {
-                        role: m.role as openai.ChatCompletionRequestMessageRoleEnum,
+                        role: m.role as ChatRole,
                         content: m.message ?? "",
                     };
                 }) ?? [];
@@ -77,23 +73,32 @@ export default async function handler(
             const request = [
                 ...previousConvertations,
                 {
-                    role: newMessage.role as openai.ChatCompletionRequestMessageRoleEnum,
+                    role: newMessage.role as ChatRole,
                     content: newMessage?.message ?? "",
                 },
             ];
-            const completion = await openaiApi.createChatCompletion({
-                model: "gpt-3.5-turbo",
-                messages: request,
-            });
-            const data = completion.data.choices[0].message;
-
-            await createMessage({
+            const client = new OpenAIClient(
+                endpoint,
+                new AzureKeyCredential(apikey!)
+            );
+            const deploymentId = "test-gpt001";
+            const events = await client.getChatCompletions(
+                deploymentId,
+                request,
+                { maxTokens: 800 }
+            );
+            const data = events.choices[0];
+            console.log(data, 'message');
+        
+            
+            const finalResult = {
+                role: data.message?.role ?? "assistant",
                 chatId: chat.id,
-                role: "assistant",
-                message: data?.content ?? "",
-            });
-
-            return res.status(200).json(data as Data);
+                message: data.message?.content,
+            }
+            await createMessage(finalResult);
+            
+            return res.status(200).json(finalResult as Data);
         } catch (e) {
             console.log(e);
             return res
@@ -101,5 +106,4 @@ export default async function handler(
                 .json({ role: "system", message: "Bad Request", chatId: 0 });
         }
     }
-    // return res.status(400).json({ response: "Bad Request" });
 }
